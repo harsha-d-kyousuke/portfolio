@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Adithiyaa JP — Precision in Motion</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --black: #0a0a0a;
+      --white: #f5f5f5;
+      --gray: #2a2a2a;
+      --cyan: #00d9ff;
+      --font-mono: 'JetBrains Mono', monospace;
+      --font-sans: 'Inter', sans-serif;
+    }
+    body { background: var(--black); color: var(--white); font-family: var(--font-sans); overflow-x: hidden; line-height: 1.6; }
+    #loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--black); display: flex; align-items: center; justify-content: center; z-index: 9999; }
+    .core-circle { width: 120px; height: 120px; border: 2px solid var(--cyan); border-radius: 50%; opacity: 0; }
+    .hero { min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; padding: 2rem; overflow: hidden; }
+    .rotating-assembly { position: absolute; width: 400px; height: 400px; z-index: 0; opacity: 0.15; pointer-events: none; }
+    .assembly-layer { position: absolute; border: 1px solid var(--cyan); border-radius: 50%; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+    .layer-1 { width: 400px; height: 400px; }
+    .layer-2 { width: 300px; height: 300px; border-style: dashed; }
+    .layer-3 { width: 200px; height: 200px; }
+    .layer-4 { width: 100px; height: 100px; background: rgba(0, 217, 255, 0.05); }
+    .hero-content { position: relative; z-index: 1; text-align: center; }
+    .line-divider { width: 0; height: 1px; background: var(--cyan); margin: 1.5rem auto; }
+    h1 { font-size: 3.5rem; font-weight: 700; opacity: 0; font-family: var(--font-sans); letter-spacing: -0.02em; }
+    .subtitle { font-family: var(--font-mono); font-size: 0.95rem; color: #888; opacity: 0; margin-top: 0.5rem; }
+    .tagline { font-size: 1.1rem; opacity: 0; margin-top: 1rem; color: #bbb; }
+    section { max-width: 1100px; margin: 0 auto; padding: 5rem 2rem; position: relative; }
+    .section-title { font-size: 2rem; margin-bottom: 2rem; position: relative; display: inline-block; opacity: 0; }
+    .section-title::after { content: ''; position: absolute; bottom: -8px; left: 0; width: 0; height: 2px; background: var(--cyan); transition: width 0.6s ease; }
+    .section-title.active::after { width: 100%; }
+    .about-text { font-size: 1.1rem; line-height: 1.8; color: #ccc; opacity: 0; }
+    .about-text strong { color: var(--cyan); font-weight: 600; }
+    .projects-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem; margin-top: 2rem; }
+    .project-card { background: var(--gray); border: 1px solid #333; padding: 1.8rem; border-radius: 4px; opacity: 0; transform: translateY(30px); cursor: pointer; transition: border-color 0.3s; position: relative; overflow: hidden; }
+    .project-card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 2px; background: var(--cyan); transform: scaleX(0); transform-origin: left; transition: transform 0.4s ease; }
+    .project-card:hover::before { transform: scaleX(1); }
+    .project-card:hover { border-color: var(--cyan); }
+    .project-title { font-size: 1.3rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--cyan); }
+    .project-stack { font-family: var(--font-mono); font-size: 0.85rem; color: #888; margin-bottom: 1rem; }
+    .project-desc { color: #bbb; font-size: 0.95rem; line-height: 1.6; }
+    .skills-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem; margin-top: 2rem; }
+    .skill-category { opacity: 0; }
+    .skill-category h3 { font-size: 1.1rem; margin-bottom: 1rem; color: var(--cyan); font-family: var(--font-mono); }
+    .skill-item { display: flex; align-items: center; margin-bottom: 0.8rem; gap: 1rem; }
+    .skill-name { flex: 1; font-size: 0.95rem; color: #ccc; }
+    .skill-bar { flex: 2; height: 6px; background: #1a1a1a; border-radius: 3px; overflow: hidden; }
+    .skill-fill { height: 100%; background: var(--cyan); width: 0; border-radius: 3px; }
+    .soft-skills { display: flex; flex-wrap: wrap; gap: 0.8rem; margin-top: 1rem; }
+    .soft-skill-badge { background: var(--gray); border: 1px solid #444; padding: 0.6rem 1.2rem; border-radius: 4px; font-size: 0.9rem; color: var(--white); opacity: 0; transform: scale(0.9); transition: all 0.3s ease; }
+    .soft-skill-badge:hover { border-color: var(--cyan); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0, 217, 255, 0.2); }
+    .experience-card { background: var(--gray); border: 1px solid #333; padding: 2rem; border-radius: 4px; margin-bottom: 2rem; opacity: 0; transform: translateY(30px); position: relative; overflow: hidden; }
+    .experience-card::before { content: ''; position: absolute; top: 0; left: 0; width: 3px; height: 100%; background: var(--cyan); transform: scaleY(0); transform-origin: top; transition: transform 0.5s ease; }
+    .experience-card:hover::before { transform: scaleY(1); }
+    .exp-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem; flex-wrap: wrap; gap: 1rem; }
+    .exp-title { font-size: 1.3rem; font-weight: 600; color: var(--cyan); }
+    .exp-duration { font-family: var(--font-mono); font-size: 0.85rem; color: #888; }
+    .exp-company { font-size: 1rem; color: #bbb; margin-bottom: 1rem; }
+    .exp-desc { color: #ccc; line-height: 1.7; }
+    .exp-tech { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1rem; }
+    .tech-tag { background: #1a1a1a; border: 1px solid #333; padding: 0.4rem 0.8rem; border-radius: 3px; font-size: 0.8rem; font-family: var(--font-mono); color: var(--cyan); }
+    .timeline-item { margin-bottom: 2.5rem; padding-left: 2rem; border-left: 2px solid #333; opacity: 0; position: relative; }
+    .timeline-item::before { content: ''; position: absolute; left: -5px; top: 0; width: 8px; height: 8px; background: var(--cyan); border-radius: 50%; }
+    .timeline-title { font-size: 1.2rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--white); }
+    .timeline-subtitle { font-family: var(--font-mono); font-size: 0.9rem; color: #888; margin-bottom: 0.5rem; }
+    .timeline-desc { color: #bbb; font-size: 0.95rem; }
+    footer { text-align: center; padding: 3rem 2rem; border-top: 1px solid #333; }
+    .contact-links { display: flex; justify-content: center; gap: 2rem; margin-top: 1.5rem; flex-wrap: wrap; }
+    .contact-link { color: var(--cyan); text-decoration: none; font-family: var(--font-mono); font-size: 0.9rem; opacity: 0; transition: opacity 0.3s; }
+    .contact-link:hover { opacity: 0.7; }
+    @media (max-width: 768px) {
+      h1 { font-size: 2.5rem; }
+      .rotating-assembly { width: 280px; height: 280px; }
+      .layer-1 { width: 280px; height: 280px; }
+      .layer-2 { width: 210px; height: 210px; }
+      .layer-3 { width: 140px; height: 140px; }
+      .layer-4 { width: 70px; height: 70px; }
+      .projects-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div id="loader"><div class="core-circle"></div></div>
+  <div class="hero">
+    <div class="rotating-assembly">
+      <div class="assembly-layer layer-1"></div>
+      <div class="assembly-layer layer-2"></div>
+      <div class="assembly-layer layer-3"></div>
+      <div class="assembly-layer layer-4"></div>
+    </div>
+    <div class="hero-content">
+      <h1>Adithiyaa JP</h1>
+      <div class="line-divider"></div>
+      <p class="subtitle">harsha-d-kyousuke · he/him</p>
+      <p class="tagline">Python Developer | Linux | AI Automation</p>
+    </div>
+  </div>
+  <section id="about">
+    <h2 class="section-title">About</h2>
+    <p class="about-text">👋 Hi! I'm <strong>Adithiyaa</strong>, a Python enthusiast exploring the world of code. 🚀 I'm a B.Tech CSE (AI & DS) student at <strong>Vel Tech Rangarajan Dr. Sagunthala R&D Institute</strong>, passionate about open-source development, Linux (especially Arch), automation, and building life systems inspired by anime and RPGs.</p>
+    <p class="about-text" style="margin-top: 1.5rem;">With experience in <strong>UK-style software workflows</strong> and global developer communities, I thrive on creating tools that merge functionality with creativity. My interests span from <strong>terminal UI design</strong> and <strong>Linux ricing</strong> to gamified productivity systems and self-hosted applications.</p>
+    <p class="about-text" style="margin-top: 1.5rem;">When I'm not coding, you'll find me immersed in anime/manga (Solo Leveling, Chainsaw Man), exploring Genshin Impact, or optimizing my Arch Linux setup. Let's connect and build something awesome together! 🐍✨</p>
+  </section>
+  <section id="projects">
+    <h2 class="section-title">Projects</h2>
+    <div class="projects-grid">
+      <div class="project-card"><h3 class="project-title">Kaizen Academy</h3><p class="project-stack">HTML · CSS · JS · LocalStorage</p><p class="project-desc">Life-sim & learning platform combining gamified coding challenges and daily habits inspired by Solo Leveling.</p></div>
+      <div class="project-card"><h3 class="project-title">AIT (AI Training Toolkit)</h3><p class="project-stack">Python · ML Libraries</p><p class="project-desc">AI training and inference toolkit with automation utilities for model deployment and testing workflows.</p></div>
+      <div class="project-card"><h3 class="project-title">Crop Prediction Device</h3><p class="project-stack">Python · Arduino · IoT Sensors</p><p class="project-desc">Smart agricultural device predicting suitable crops using real-time soil moisture, pH levels, and climate sensor data.</p></div>
+      <div class="project-card"><h3 class="project-title">Oblivion Browser</h3><p class="project-stack">Electron.js · Node.js · Chromium</p><p class="project-desc">Minimalist privacy-first browser with terminal-styled UI and tabbed navigation.</p></div>
+      <div class="project-card"><h3 class="project-title">LeetCode Logs</h3><p class="project-stack">Java · File I/O</p><p class="project-desc">Problem-solving logger tracking coding challenges and time complexity analysis.</p></div>
+      <div class="project-card"><h3 class="project-title">Fitness Checker</h3><p class="project-stack">HTML · JavaScript</p><p class="project-desc">Comprehensive tracker for workout progress and body composition data.</p></div>
+      <div class="project-card"><h3 class="project-title">Akadi Products</h3><p class="project-stack">HTML · CSS · JS</p><p class="project-desc">Premium e-commerce product showcase with responsive design.</p></div>
+      <div class="project-card"><h3 class="project-title">Cybersecurity Monitor</h3><p class="project-stack">Python · Network Analysis</p><p class="project-desc">Prototype security analysis tool for monitoring network traffic patterns.</p></div>
+      <div class="project-card"><h3 class="project-title">Bank Management</h3><p class="project-stack">TypeScript · OOP</p><p class="project-desc">Banking CRUD application with transaction processing.</p></div>
+      <div class="project-card"><h3 class="project-title">Notes Utility</h3><p class="project-stack">Java · Swing GUI</p><p class="project-desc">Local note-taking application with categorization and search.</p></div>
+    </div>
+  </section>
+  <section id="skills">
+    <h2 class="section-title">Technical Arsenal</h2>
+    <div class="skills-container">
+      <div class="skill-category"><h3>Core Languages</h3>
+        <div class="skill-item"><span class="skill-name">Python</span><div class="skill-bar"><div class="skill-fill" data-width="90"></div></div></div>
+        <div class="skill-item"><span class="skill-name">Java</span><div class="skill-bar"><div class="skill-fill" data-width="85"></div></div></div>
+        <div class="skill-item"><span class="skill-name">C</span><div class="skill-bar"><div class="skill-fill" data-width="80"></div></div></div>
+        <div class="skill-item"><span class="skill-name">TypeScript</span><div class="skill-bar"><div class="skill-fill" data-width="75"></div></div></div>
+      </div>
+      <div class="skill-category"><h3>Web & Frameworks</h3>
+        <div class="skill-item"><span class="skill-name">HTML/CSS/JS</span><div class="skill-bar"><div class="skill-fill" data-width="88"></div></div></div>
+        <div class="skill-item"><span class="skill-name">Electron.js</span><div class="skill-bar"><div class="skill-fill" data-width="75"></div></div></div>
+        <div class="skill-item"><span class="skill-name">Node.js</span><div class="skill-bar"><div class="skill-fill" data-width="70"></div></div></div>
+        <div class="skill-item"><span class="skill-name">Responsive Design</span><div class="skill-bar"><div class="skill-fill" data-width="85"></div></div></div>
+      </div>
+      <div class="skill-category"><h3>Data & Automation</h3>
+        <div class="skill-item"><span class="skill-name">Pandas/NumPy</span><div class="skill-bar"><div class="skill-fill" data-width="82"></div></div></div>
+        <div class="skill-item"><span class="skill-name">Selenium</span><div class="skill-bar"><div class="skill-fill" data-width="78"></div></div></div>
+        <div class="skill-item"><span class="skill-name">ML Basics</span><div class="skill-bar"><div class="skill-fill" data-width="70"></div></div></div>
+        <div class="skill-item"><span class="skill-name">Scripting</span><div class="skill-bar"><div class="skill-fill" data-width="85"></div></div></div>
+      </div>
+      <div class="skill-category"><h3>Systems & Tools</h3>
+        <div class="skill-item"><span class="skill-name">Arch Linux</span><div class="skill-bar"><div class="skill-fill" data-width="92"></div></div></div>
+        <div class="skill-item"><span class="skill-name">Git/GitHub</span><div class="skill-bar"><div class="skill-fill" data-width="85"></div></div></div>
+        <div class="skill-item"><span class="skill-name">Arduino/IoT</span><div class="skill-bar"><div class="skill-fill" data-width="75"></div></div></div>
+        <div class="skill-item"><span class="skill-name">Terminal UI</span><div class="skill-bar"><div class="skill-fill" data-width="88"></div></div></div>
+      </div>
+    </div>
+    <div style="margin-top: 3rem;"><h3 style="font-size: 1.3rem; margin-bottom: 1.5rem; color: var(--cyan); font-family: var(--font-mono);">Soft Skills</h3>
+      <div class="soft-skills">
+        <span class="soft-skill-badge">Problem Solving</span>
+        <span class="soft-skill-badge">Public Speaking</span>
+        <span class="soft-skill-badge">Team Collaboration</span>
+        <span class="soft-skill-badge">Self-Learning</span>
+        <span class="soft-skill-badge">Critical Thinking</span>
+        <span class="soft-skill-badge">Open Source</span>
+        <span class="soft-skill-badge">Agile Workflows</span>
+        <span class="soft-skill-badge">Documentation</span>
+      </div>
+    </div>
+  </section>
+  <section id="experience">
+    <h2 class="section-title">Experience</h2>
+    <div class="experience-card">
+      <div class="exp-header"><div><h3 class="exp-title">Open Source Development</h3><p class="exp-company">GitHub Community</p></div><span class="exp-duration">2023 - Present</span></div>
+      <p class="exp-desc">Active contributor to open-source projects with focus on developer tools and automation utilities.</p>
+      <div class="exp-tech"><span class="tech-tag">Git</span><span class="tech-tag">GitHub</span><span class="tech-tag">Code Review</span></div>
+    </div>
+    <div class="experience-card">
+      <div class="exp-header"><div><h3 class="exp-title">Linux System Administration</h3><p class="exp-company">Arch Linux</p></div><span class="exp-duration">2022 - Present</span></div>
+      <p class="exp-desc">Daily driver of Arch Linux with experience in system configuration and shell scripting.</p>
+      <div class="exp-tech"><span class="tech-tag">Arch Linux</span><span class="tech-tag">Bash</span><span class="tech-tag">Dotfiles</span></div>
+    </div>
+    <div class="experience-card">
+      <div class="exp-header"><div><h3 class="exp-title">Hackathon Participation</h3><p class="exp-company">ULD x India & VIT</p></div><span class="exp-duration">2024</span></div>
+      <p class="exp-desc">Top 5000 in ULD Hackathon. 2nd place at VIT Makeathon 25 presenting Linux development tool.</p>
+      <div class="exp-tech"><span class="tech-tag">Rapid Prototyping</span><span class="tech-tag">Leadership</span></div>
+    </div>
+  </section>
+  <section id="education">
+    <h2 class="section-title">Education & Awards</h2>
+    <div class="timeline-item"><h3 class="timeline-title">Vel Tech R&D Institute</h3><p class="timeline-subtitle">B.Tech CSE (AI & DS) · 2023 - 2027</p><p class="timeline-desc">Chennai, India</p></div>
+    <div class="timeline-item"><h3 class="timeline-title">ULD x India Hackathon</h3><p class="timeline-subtitle">Top 5000 / 20,000 participants</p><p class="timeline-desc">Innovative real-world tech problem statements.</p></div>
+    <div class="timeline-item"><h3 class="timeline-title">VIT Makeathon 25</h3><p class="timeline-subtitle">2nd Place</p><p class="timeline-desc">Minimal Linux-focused development tool.</p></div>
+    <div class="timeline-item"><h3 class="timeline-title">Certifications</h3><p class="timeline-subtitle">Continuous Learning</p><p class="timeline-desc">Python, Web Dev (Angela Yu) · Ethical Hacking (Zaid Sabih)</p></div>
+  </section>
+  <footer>
+    <p style="opacity: 0;" class="footer-text">Let's build something together</p>
+    <div class="contact-links">
+      <a href="mailto:jpadithiyaaschool@gmail.com" class="contact-link">📧 Email</a>
+      <a href="https://github.com/harsha-d-kyousuke" target="_blank" class="contact-link">🔗 GitHub</a>
+      <a href="https://www.linkedin.com/in/adithiyaa-jp" target="_blank" class="contact-link">💼 LinkedIn</a>
+      <span class="contact-link">📍 Chennai</span>
+    </div>
+  </footer>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+  <script>
+    anime.timeline().add({targets:'.core-circle',opacity:[0,1],scale:[0.5,1],duration:1200,easing:'easeOutExpo'}).add({targets:'.core-circle',scale:[1,20],opacity:[1,0],duration:800,easing:'easeInExpo',complete:()=>{document.getElementById('loader').style.display='none';initHero();}});
+    function initHero(){anime({targets:'.rotating-assembly',rotate:360,duration:80000,easing:'linear',loop:true});anime({targets:'.layer-1',rotate:-360,duration:60000,easing:'linear',loop:true});anime({targets:'.layer-2',rotate:360,duration:45000,easing:'linear',loop:true});anime({targets:'.layer-3',rotate:-360,duration:30000,easing:'linear',loop:true});anime.timeline().add({targets:'h1',opacity:[0,1],translateY:[30,0],duration:1200,easing:'easeOutExpo'}).add({targets:'.line-divider',width:['0%','200px'],duration:800,easing:'easeOutExpo'},'-=800').add({targets:'.subtitle',opacity:[0,1],translateY:[20,0],duration:800,easing:'easeOutExpo'},'-=400').add({targets:'.tagline',opacity:[0,1],translateY:[20,0],duration:800,easing:'easeOutExpo'},'-=600');}
+    const obs=new IntersectionObserver(e=>{e.forEach(n=>{if(n.isIntersecting){const t=n.target.querySelector('.section-title');if(t&&parseFloat(getComputedStyle(t).opacity)===0){anime({targets:t,opacity:[0,1],translateX:[-30,0],duration:800,easing:'easeOutExpo',complete:()=>t.classList.add('active')});animateContent(n.target);}}})},{threshold:0.2});
+    document.querySelectorAll('section').forEach(s=>obs.observe(s));
+    function animateContent(s){const id=s.id;if(id==='about'){anime({targets:'.about-text',opacity:[0,1],translateY:[30,0],duration:1000,delay:300,easing:'easeOutExpo'});}if(id==='projects'){anime({targets:'.project-card',opacity:[0,1],translateY:[40,0],duration:800,delay:anime.stagger(120),easing:'spring(1,80,10,0)'});}if(id==='skills'){anime({targets:'.skill-category',opacity:[0,1],translateY:[30,0],duration:800,delay:anime.stagger(150),easing:'easeOutExpo',complete:()=>{document.querySelectorAll('.skill-fill').forEach(f=>{const w=f.getAttribute('data-width');anime({targets:f,width:['0%',w+'%'],duration:1200,easing:'easeOutExpo'});});anime({targets:'.soft-skill-badge',opacity:[0,1],scale:[0.9,1],duration:600,delay:anime.stagger(80),easing:'spring(1,80,10,0)'})}});}if(id==='experience'){anime({targets:'.experience-card',opacity:[0,1],translateY:[40,0],duration:800,delay:anime.stagger(200),easing:'spring(1,80,10,0)'});}if(id==='education'){anime({targets:'.timeline-item',opacity:[0,1],translateX:[-30,0],duration:800,delay:anime.stagger(200),easing:'easeOutExpo'});}}
+    const footObs=new IntersectionObserver(e=>{e.forEach(n=>{if(n.isIntersecting){anime.timeline().add({targets:'.footer-text',opacity:[0,1],translateY:[20,0],duration:800,easing:'easeOutExpo'}).add({targets:'.contact-link',opacity:[0,1],translateY:[20,0],duration:600,delay:anime.stagger(100),easing:'easeOutExpo'},'-=400');}})},{threshold:0.5});
+    footObs.observe(document.querySelector('footer'));
+    window.addEventListener('scroll',()=>{const s=window.pageYOffset;const a=document.querySelector('.rotating-assembly');if(a){a.style.transform=`translateY(${s*0.3}px) rotate(${s*0.1}deg)`;}});
+    document.querySelectorAll('.project-card').forEach(c=>{c.addEventListener('mouseenter',()=>anime({targets:c,scale:[1,1.02],duration:300,easing:'spring(1,80,10,0)'}));c.addEventListener('mouseleave',()=>anime({targets:c,scale:[1.02,1],duration:300,easing:'spring(1,80,10,0)'}));c.addEventListener('click',()=>anime({targets:c,rotateY:[0,10,0],duration:600,easing:'easeOutElastic(1,.6)'}));});
+  </script>
+</body>
+</html>
